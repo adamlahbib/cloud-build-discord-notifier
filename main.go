@@ -20,6 +20,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/GoogleCloudPlatform/cloud-build-notifiers/lib/notifiers"
 	log "github.com/golang/glog"
@@ -136,6 +138,9 @@ Environment: ` + build.ProjectId + `
 Logs: ` + build.LogUrl + `
 Access: ` + build.Substitutions["_URL"],
 		})
+		if strings.Contains(build.Substitutions["_APP_NAME"], "backend") {
+			callDojo()
+		}
 	case cbpb.Build_FAILURE, cbpb.Build_INTERNAL_ERROR, cbpb.Build_TIMEOUT:
 		embeds = append(embeds, embed{
 			Title: fmt.Sprintf("❌ ERROR - %s", build.Status),
@@ -162,4 +167,15 @@ Logs: ` + build.LogUrl,
 	return &discordMessage{
 		Embeds: embeds,
 	}, nil
+}
+
+func callDojo() {
+	dojoURL := os.Getenv("DOJO_URL")
+	if dojoURL != "" {
+		if _, err := http.Get(dojoURL); err != nil {
+			log.Errorf("Failed to call dojo %s", err)
+		} else {
+			log.Infof("Successfully called dojo")
+		}
+	}
 }
