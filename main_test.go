@@ -15,6 +15,10 @@ func TestBuildMessage(t *testing.T) {
 		Id:        "some-build-id",
 		Status:    cbpb.Build_SUCCESS,
 		LogUrl:    "https://some.example.com/log/url?foo=bar",
+		Substitutions: map[string]string{
+			"_APP_NAME": "my-app",
+			"_URL":      "https://some.example.com",
+		},
 	}
 
 	got, err := n.buildMessage(b)
@@ -26,6 +30,13 @@ func TestBuildMessage(t *testing.T) {
 		Embeds: []embed{
 			{Title: "✅ SUCCESS",
 				Color: 1127128,
+				Description: `
+				Build ID: ` + b.Id + `
+				Service: ` + b.Substitutions["_APP_NAME"] + `
+				Environment: ` + b.ProjectId + `
+				Logs: ` + b.LogUrl + `
+				Access: ` + b.Substitutions["_URL"] + `
+			`,
 			},
 		},
 	})
