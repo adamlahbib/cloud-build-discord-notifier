@@ -116,42 +116,36 @@ func (s *discordNotifier) buildMessage(build *cbpb.Build) (*discordMessage, erro
 	if sourceRepo != nil {
 		sourceText = sourceRepo.GetRepoName()
 	}
-
 	switch build.Status {
 	case cbpb.Build_WORKING:
 		embeds = append(embeds, embed{
 			Title: "🔨 BUILDING",
 			Color: 1027128,
-			Description: `
-				Build ID: ` + build.Id + `
-				Service: ` + build.Substitutions["_APP_NAME"] + `
-				Environment: ` + build.ProjectId + `
-				Logs: ` + build.LogUrl + `
-			`,
+			Description: `Build ID: ` + build.Id + `
+Service: ` + build.Substitutions["_APP_NAME"] + `
+Environment: ` + build.ProjectId + `
+Logs: ` + build.LogUrl,
 		})
 	case cbpb.Build_SUCCESS:
 		embeds = append(embeds, embed{
 			Title: "✅ SUCCESS",
 			Color: 1127128,
-			Description: `
-			Build ID: ` + build.Id + `
-			Service: ` + build.Substitutions["_APP_NAME"] + `
-			Environment: ` + build.ProjectId + `
-			Logs: ` + build.LogUrl + `
-			Access: ` + build.Substitutions["_URL"] + `
-		`,
+			Description: `Build ID: ` + build.Id + `
+Service: ` + build.Substitutions["_APP_NAME"] + `
+Environment: ` + build.ProjectId + `
+Logs: ` + build.LogUrl + `
+Access: ` + build.Substitutions["_URL"],
 		})
 	case cbpb.Build_FAILURE, cbpb.Build_INTERNAL_ERROR, cbpb.Build_TIMEOUT:
 		embeds = append(embeds, embed{
 			Title: fmt.Sprintf("❌ ERROR - %s", build.Status),
 			Color: 14177041,
-			Description: `
-			Build ID: ` + build.Id + `
-			Service: ` + build.Substitutions["_APP_NAME"] + `
-			Environment: ` + build.ProjectId + `
-			Logs: ` + build.LogUrl + `
-		`,
+			Description: `Build ID: ` + build.Id + `
+Service: ` + build.Substitutions["_APP_NAME"] + `
+Environment: ` + build.ProjectId + `
+Logs: ` + build.LogUrl,
 		})
+
 	default:
 		log.Infof("Unknown status %s", build.Status)
 	}

@@ -30,13 +30,11 @@ func TestBuildMessage(t *testing.T) {
 		Embeds: []embed{
 			{Title: "✅ SUCCESS",
 				Color: 1127128,
-				Description: `
-				Build ID: ` + b.Id + `
-				Service: ` + b.Substitutions["_APP_NAME"] + `
-				Environment: ` + b.ProjectId + `
-				Logs: ` + b.LogUrl + `
-				Access: ` + b.Substitutions["_URL"] + `
-			`,
+				Description: `Build ID: ` + b.Id + `
+Service: ` + b.Substitutions["_APP_NAME"] + `
+Environment: ` + b.ProjectId + `
+Logs: ` + b.LogUrl + `
+Access: ` + b.Substitutions["_URL"],
 			},
 		},
 	})
