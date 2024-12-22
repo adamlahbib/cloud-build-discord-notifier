@@ -84,28 +84,28 @@ func (s *discordNotifier) SendNotification(ctx context.Context, build *cbpb.Buil
 	if s.filter != nil && s.filter.Apply(ctx, build) {
 		return nil
 	}
+	if build.Substitutions["_APP_NAME"] != "" {
+		log.Infof("sending discord webhook for Build %q (status: %q)", build.Id, build.Status)
+		msg, err := s.buildMessage(build)
+		if err != nil {
+			return fmt.Errorf("failed to write discord message: %w", err)
+		}
+		if msg == nil {
+			return nil
+		}
 
-	log.Infof("sending discord webhook for Build %q (status: %q)", build.Id, build.Status)
-	msg, err := s.buildMessage(build)
-	if err != nil {
-		return fmt.Errorf("failed to write discord message: %w", err)
-	}
-	if msg == nil {
-		return nil
-	}
+		payload, err := json.Marshal(msg)
+		if err != nil {
+			return fmt.Errorf("Unable to marshal payload %w", err)
+		}
 
-	payload, err := json.Marshal(msg)
-	if err != nil {
-		return fmt.Errorf("Unable to marshal payload %w", err)
+		log.Infof("sending payload %s", string(payload))
+		resp, err := http.Post(s.webhookURL, "application/json", bytes.NewBuffer(payload))
+		if err != nil {
+			return err
+		}
+		log.Infof("got resp %+v", resp)
 	}
-
-	log.Infof("sending payload %s", string(payload))
-	resp, err := http.Post(s.webhookURL, "application/json", bytes.NewBuffer(payload))
-	if err != nil {
-		return err
-	}
-	log.Infof("got resp %+v", resp)
-
 	return nil
 }
 
